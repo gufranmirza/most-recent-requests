@@ -46,12 +46,13 @@ func main() {
 	}(ctx)
 
 	go func(ctx context.Context) {
+		ticker := time.NewTicker(time.Second * time.Duration(lastTransactionsDuration))
+		defer ticker.Stop()
 		for {
 			select {
 			case <-ctx.Done():
 				return
-			default:
-				time.Sleep(time.Second * time.Duration(lastTransactionsDuration))
+			case <-ticker.C:
 				sum, avg, transactions := GET()
 				fmt.Printf("Last Transactions in Last %v Seconds Transactions=%v Sum=%v Average=%v\n", lastTransactionsDuration, transactions, sum, avg)
 			}

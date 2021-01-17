@@ -11,13 +11,14 @@ type Map struct {
 	items map[int64]Transaction
 }
 
+// NewMap returns map with specified size limits
 func NewMap(size int64) *Map {
 	return &Map{
 		items: make(map[int64]Transaction, size),
 	}
 }
 
-// Sets a key in a concurrent map
+// Set a key in a concurrent map
 func (m *Map) Set(key int64, value *Transaction) {
 	m.Lock()
 	defer m.Unlock()
@@ -25,7 +26,7 @@ func (m *Map) Set(key int64, value *Transaction) {
 	m.items[key] = *value
 }
 
-// Gets a key from a concurrent map
+// Get a key from a concurrent map
 func (m *Map) Get(key int64) (Transaction, bool) {
 	m.Lock()
 	defer m.Unlock()
@@ -34,6 +35,7 @@ func (m *Map) Get(key int64) (Transaction, bool) {
 	return value, ok
 }
 
+// Analytics returns transaction analytics
 func (m *Map) Analytics() <-chan TransactionsAnalytics {
 	c := make(chan TransactionsAnalytics, len(m.items))
 
@@ -49,9 +51,9 @@ func (m *Map) Analytics() <-chan TransactionsAnalytics {
 		}
 
 		c <- TransactionsAnalytics{
-			TotalAmount: sum, 
-			AverageAmount: (sum/float64(transactions)), 
-			Transactions: transactions ,
+			TotalAmount:   sum,
+			AverageAmount: (sum / float64(transactions)),
+			Transactions:  transactions,
 		}
 		close(c)
 
